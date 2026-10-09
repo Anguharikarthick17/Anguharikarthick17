@@ -4,7 +4,7 @@
 
 **GENZLOG** — The Digital Log of Gen Z
 
-<p align="center"><a href="assets/ascii-portrait.svg"><img src="assets/ascii-portrait.svg" alt="Terminal portrait"></a></p>
+<p align="center"><a href="assets/ascii-portrait.svg"><img src="assets/ascii-portrait.svg" alt="Green terminal-style ASCII portrait of AHK"></a></p>
 
 ## `~/about`
 
@@ -22,9 +22,9 @@ Currently building: Personal software projects · GENZLOG - Creative Technology 
 
 ## `~/activity`
 
-![GitHub contribution heatmap for Anguharikarthick17. Each square's color represents a contribution level; its SVG tooltip shows the date and contribution count.](assets/contrib-heatmap.svg)
+![GitHub contribution heatmap for Anguharikarthick17. Each square's color represents a contribution level; its SVG tooltip provides the date and contribution count.](assets/contrib-heatmap.svg)
 
-Generated from the GitHub contribution calendar for `Anguharikarthick17`. Colors represent GitHub's contribution levels; hovering a day shows its date and count through the SVG tooltip.
+Generated from the GitHub contribution calendar for `Anguharikarthick17`. Colors represent GitHub contribution levels; the SVG title on each day provides its date and exact count. Some configured repositories may be private or otherwise return 404 to anonymous visitors. The project names and configured URLs are retained; verify visibility in GitHub if a link is inaccessible.
 
 ## `~/projects`
 
@@ -61,4 +61,3 @@ Tools: `Git` · `GitHub` · `GitHub Actions` · `Visual Studio Code`
 - [Instagram](https://www.instagram.com/angu.hk/)
 
 <p align="center"><code>GENZLOG</code> // curious by design</p>
-# Anguharikarthick17

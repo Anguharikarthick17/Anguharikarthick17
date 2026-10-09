@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import tempfile
 from datetime import date
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -13,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "contributions.json"
 OUTPUT = ROOT / "assets" / "contrib-heatmap.svg"
 COLORS = {
-    "NONE": "#14251b",
+    "NONE": "#161b22",
     "FIRST_QUARTILE": "#0e4429",
     "SECOND_QUARTILE": "#006d32",
     "THIRD_QUARTILE": "#26a641",
@@ -43,18 +45,21 @@ def flatten_days(data: dict) -> list[dict]:
             if parsed_date.isoformat() != day["date"]:
                 raise ValueError("contribution day has a non-canonical ISO date")
             days.append(day)
+    dates = [date.fromisoformat(day["date"]) for day in days]
+    if any(current.toordinal() != previous.toordinal() + 1 for previous, current in zip(dates, dates[1:])):
+        raise ValueError("contribution dates must be consecutive and unique")
     return days
 
 
 def render_unavailable(message: str) -> str:
     safe = escape(message)
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 150" role="img" aria-labelledby="title desc">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="860" height="150" viewBox="0 0 860 150" role="img" aria-labelledby="title desc">
   <title id="title">Contribution heatmap not configured</title>
   <desc id="desc">{safe}</desc>
   <style>
-    .bg {{ fill: #07110d; }} .border {{ fill: none; stroke: #234634; }}
-    .title {{ fill: #63f59a; font: 600 16px ui-monospace, Menlo, monospace; }}
-    .message {{ fill: #b4c8ba; font: 13px ui-monospace, Menlo, monospace; }}
+    .bg {{ fill: #0D1117; }} .border {{ fill: none; stroke: #234634; }}
+    .title {{ fill: #69F0A0; font: 600 16px ui-monospace, Menlo, monospace; }}
+    .message {{ fill: #C9D1D9; font: 13px ui-monospace, Menlo, monospace; }}
   </style>
   <rect class="bg" width="100%" height="100%" rx="12"/><rect class="border" x=".5" y=".5" width="859" height="149" rx="12"/>
   <text class="title" x="24" y="52">CONTRIBUTION DATA UNAVAILABLE</text>
@@ -64,13 +69,23 @@ def render_unavailable(message: str) -> str:
 
 
 def render(data: dict) -> str:
-    if not data.get("available"):
+    if not isinstance(data, dict):
+        raise ValueError("contributions data must be an object")
+    if data.get("available") is not True:
         message = data.get("message") or "Configure a GitHub username and token, then run the contribution fetch script."
         return render_unavailable(str(message))
-    username = escape(str(data.get("username", "GitHub user")))
+    raw_username = data.get("username")
+    if not isinstance(raw_username, str) or not raw_username.strip():
+        raise ValueError("available contribution data must include a username")
+    username = escape(raw_username)
     days = flatten_days(data)
     if not days:
         return render_unavailable("The API returned no contribution days. Re-run the fetch after checking the account.")
+    total = data.get("total_contributions")
+    if type(total) is not int or total < 0:
+        raise ValueError("available contribution data must include a non-negative integer total")
+    if sum(day["count"] for day in days) != total:
+        raise ValueError("contribution total does not match the sum of the displayed daily counts")
 
     first_day = min(date.fromisoformat(day["date"]) for day in days)
     start = date.fromordinal(first_day.toordinal() - (first_day.weekday() + 1) % 7)
@@ -103,28 +118,28 @@ def render(data: dict) -> str:
             x = grid_x + ((current - start).days // 7) * step
             month_labels.append(f'<text class="muted" x="{x}" y="43">{current.strftime("%b")}</text>')
             seen_months.add(month_key)
-    total = data.get("total_contributions")
-    total_label = f"{total} contributions in the displayed calendar" if isinstance(total, int) else "Contribution levels shown; counts available on hover"
-    legend_x = max(grid_x + 8, width - 143)
+    total_label = f"{total} contributions in the displayed calendar"
+    total_header = f"{total} contributions"
+    legend_x = max(grid_x + 8, width - 205)
     legend = []
     for index, level in enumerate(
         ("NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH_QUARTILE")
     ):
         legend.append(f'<rect x="{legend_x + index * 16}" y="151" width="11" height="11" rx="2" fill="{COLORS[level]}"/>')
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">{username} GitHub contribution heatmap</title>
   <desc id="desc">Contribution intensity by day for {username}. Colors encode contribution levels; hover a square for the exact count and date. {escape(total_label)}.</desc>
   <style>
-    .bg {{ fill: #07110d; }} .border {{ fill: none; stroke: #234634; }}
-    .heading {{ fill: #63f59a; font: 600 14px ui-monospace, Menlo, monospace; }}
-    .muted {{ fill: #91a99a; font: 11px ui-monospace, Menlo, monospace; }}
+    .bg {{ fill: #0D1117; }} .border {{ fill: none; stroke: #234634; }}
+    .heading {{ fill: #69F0A0; font: 600 14px ui-monospace, Menlo, monospace; }}
+    .muted {{ fill: #C9D1D9; font: 11px ui-monospace, Menlo, monospace; }}
     .day {{ opacity: 0; animation: reveal .45s ease-out forwards; }}
     @keyframes reveal {{ to {{ opacity: 1; }} }}
     @media (prefers-reduced-motion: reduce) {{ .day {{ animation: none; opacity: 1; }} }}
   </style>
   <rect class="bg" width="100%" height="100%" rx="12"/><rect class="border" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="12"/>
   <text class="heading" x="24" y="27">{username} / CONTRIBUTIONS</text>
-  <text class="muted" x="{width - 258}" y="27">{escape(total_label)}</text>
+  <text class="muted" x="{width - 170}" y="27">{escape(total_header)}</text>
   {''.join(month_labels)}
   {''.join(rects)}
   <text class="muted" x="24" y="161">Contribution level</text>
@@ -147,7 +162,15 @@ def main() -> None:
     except (OSError, json.JSONDecodeError, ValueError) as error:
         parser.error(str(error))
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(svg, encoding="utf-8")
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=args.output.parent, delete=False
+    ) as output_file:
+        temporary_path = Path(output_file.name)
+        output_file.write(svg)
+    try:
+        os.replace(temporary_path, args.output)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     print(f"Wrote {args.output}")
 
 

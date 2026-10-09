@@ -3,5 +3,11 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.*
+!.env.example
+photos/
+secrets/
+*.pem
+*.key
 .DS_Store
 *.log

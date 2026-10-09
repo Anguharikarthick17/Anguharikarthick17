@@ -1,6 +1,6 @@
 # GENZLOG profile setup
 
-This project generates the README art for the `Anguharikarthick17` GitHub profile. GitHub displays the root `README.md` from a public repository named exactly `Anguharikarthick17`.
+This repository generates the README art for the `Anguharikarthick17` GitHub profile. GitHub uses the root `README.md` from a public repository named exactly `Anguharikarthick17`.
 
 ## Install on macOS
 
@@ -12,35 +12,32 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-Use `.venv/bin/python` for the commands below. The configured profile data is in `data/profile.json`; its `github_username` and `contribution_graph.username` are both `Anguharikarthick17`. Keep them equal if you edit the configuration.
+Use `.venv/bin/python` for the commands below. Update `data/profile.json` to change profile content. Keep `github_username` and `contribution_graph.username` equal. Confirm that the configured bio's "Second-year undergraduate student" detail is accurate before publishing.
 
-## Generate profile artwork
+## Generate the profile artwork
 
-Regenerate the information card:
+The original photo is `photos/portrait.jpg`, which is excluded from Git. The generator reads the local photo and creates a text-based SVG; it never copies or embeds the source image.
 
 ```bash
+.venv/bin/python scripts/make_ascii_svg.py \
+  --photo photos/portrait.jpg \
+  --columns 160 \
+  --brightness 1.0 \
+  --contrast 1.15 \
+  --crop subject
 .venv/bin/python scripts/make_info_card.py
+.venv/bin/python scripts/render_heatmap_svg.py
 ```
 
-To generate a personal ASCII portrait, pass a photo stored locally. The script reads but does not copy the photo:
-
-```bash
-.venv/bin/python scripts/make_ascii_svg.py --photo "/absolute/path/to/your/portrait.jpg"
-```
-
-Do not run the portrait command without `--photo` if you already have a real portrait asset: without a photo, it deliberately replaces the art with a clearly labeled placeholder. This project does not include a portrait photo.
+The portrait generator crops around darker foreground pixels with a default grayscale threshold of `232`. Use `--crop full` or adjust `--background-threshold` for a photo with a different background. Running the portrait generator without `--photo` deliberately writes a labeled placeholder, so do not omit the photo argument when keeping the current portrait.
 
 ## Fetch real GitHub contributions locally
 
-`scripts/fetch_contributions.py` sends a `POST` to `https://api.github.com/graphql` and queries the configured user's contribution calendar. It authenticates with an HTTP `Authorization: Bearer ...` header whose value comes only from the `PROFILE_READ_TOKEN` environment variable. It does not automatically use `gh` credentials.
+`scripts/fetch_contributions.py` queries the public contribution calendar through `https://api.github.com/graphql`. It reads its authorization value only from `PROFILE_READ_TOKEN`, does not automatically use `gh` credentials, and never prints the token.
 
-### Minimum token access
+The fetcher requires a token that can read public profile data. A fine-grained or classic token with the minimum public-read access supported by GitHub is sufficient; it needs no repository write permission. For a classic token, select no scopes. If GitHub rejects the token, do not add repository write scopes: inspect the API access configuration instead.
 
-Create a short-lived **personal access token (classic)** with **no scopes selected**. GitHub documents that a classic token with no scopes can read public information. This fetch is for the public calendar; it needs no repository, organization, or write access. Do not use your broad GitHub CLI credential for this task. If GitHub returns a permissions error, leave `data/contributions.json` unchanged and investigate the API response instead of adding broad scopes.
-
-### Exact macOS fetch commands
-
-After creating the token, run the following from the project directory. The prompt is hidden. The token is passed to the fetcher process in the expected environment variable and is not saved to shell history, a file, or logs:
+To enter the token privately and pass it only to the fetcher process, run this from the project directory:
 
 ```bash
 cd /Users/angu/Documents/github
@@ -61,41 +58,34 @@ PY
 .venv/bin/python scripts/render_heatmap_svg.py
 ```
 
-The fetcher only writes `data/contributions.json` after a successful and validated response. If the username is unavailable, authentication fails, the API rate limit is hit, or the response shape changes, it reports an error and leaves existing contribution JSON untouched. The SVG encodes GitHub's `NONE`, `FIRST_QUARTILE`, `SECOND_QUARTILE`, `THIRD_QUARTILE`, and `FOURTH_QUARTILE` contribution levels; hover a day for its date and exact count. No sample data is used as actual activity.
+The fetcher validates the response, dates, contribution counts, contribution-level enum values, and calendar total before atomically replacing `data/contributions.json`. On failure, it leaves the last valid JSON unchanged. The heatmap uses GitHub's `NONE`, `FIRST_QUARTILE`, `SECOND_QUARTILE`, `THIRD_QUARTILE`, and `FOURTH_QUARTILE` levels; each SVG day title contains the date and exact count. The colors indicate levels, not exact counts. No sample data is presented as real activity.
 
-## GitHub Actions configuration
+## GitHub Actions
 
-The workflow is `.github/workflows/update-profile-art.yml`:
+`.github/workflows/update-profile-art.yml` provides manual `workflow_dispatch` and a weekly Monday schedule (`06:23 UTC`). It uses Python 3.12. The fetch step receives the repository Actions secret `PROFILE_READ_TOKEN` as an environment variable. The workflow uses the built-in `GITHUB_TOKEN` only for checkout and repository updates; the update job asks for `contents: write` and commits only the contribution JSON and heatmap SVG when those files change.
 
-- Manual trigger: **workflow_dispatch**.
-- Schedule: Mondays at `06:23 UTC` (`23 6 * * 1`).
-- Python: `3.12`.
-- API credential: Actions repository secret `PROFILE_READ_TOKEN`, injected into the fetch step as environment variable `PROFILE_READ_TOKEN`.
-- Commit credential: the built-in `GITHUB_TOKEN` provided by `actions/checkout`; it is not the profile-read secret.
-- Workflow permission: `contents: write` only, for committing the generated JSON and heatmap SVG.
+Configure the profile repository:
 
-Set it up in the profile repository:
+1. Under **Settings → Secrets and variables → Actions**, add a repository secret named `PROFILE_READ_TOKEN`. Use a token with public profile read access only; never put it in source files, profile JSON, workflow YAML, or logs.
+2. Under **Settings → Actions → General → Workflow permissions**, allow read and write permissions for `GITHUB_TOKEN`. The workflow requests only `contents: write`. Branch protection can still prevent its commit.
+3. Ensure Actions are enabled. Open **Actions → Update profile contribution art → Run workflow** to run it manually.
 
-1. Go to **Settings → Secrets and variables → Actions → New repository secret**. Name it `PROFILE_READ_TOKEN` and paste the short-lived no-scope classic token. Do not put it in the repository, profile JSON, workflow, or README.
-2. Go to **Settings → Actions → General → Workflow permissions** and enable **Read and write permissions**. The workflow still requests only `contents: write`; without repository write permission, its commit/push step cannot update generated art.
-3. Ensure Actions are enabled. Open **Actions → Update profile contribution art → Run workflow** for a manual run. Review the run logs if it fails; secrets are not echoed by the workflow.
-
-The API secret can only read public data; the repository-scoped `GITHUB_TOKEN` separately writes the generated files. Do not grant the API token repository write permissions.
+If the secret is missing, the fetcher fails clearly without replacing the last valid contribution data or exposing credentials. The workflow does not change the local portrait or the information card.
 
 ## Preview and publish
 
-Preview the root `README.md` with VS Code's Markdown preview. The README refers to `assets/ascii-portrait.svg`, `assets/info-card.svg`, and `assets/contrib-heatmap.svg` using relative paths.
+Use VS Code's Markdown preview for `README.md`. The local artwork paths are `assets/ascii-portrait.svg`, `assets/info-card.svg`, and `assets/contrib-heatmap.svg`.
 
-The profile repository has to be named exactly `Anguharikarthick17`. This project does not configure remotes or publish changes. Do not run `git push` until you explicitly decide to publish.
+The profile repository must be named exactly `Anguharikarthick17`. This setup does not configure remotes or publish anything. Review changes locally; commit or push only when you choose to do so.
 
-The configured project URLs match their configured repository names. In an anonymous GitHub API check, `EcoRoute`, `AudienceIQ`, and `BlackBox---Ai` were publicly available; `CHESS-GAME`, `AHK-MINI`, `AHK-DYNAMIC-ISLAND`, and `AHK-RESUME` returned 404. A 404 can mean a repository is private or does not exist at that URL. Verify those four in your GitHub account and make them public or remove/update their profile links before expecting visitors to open them.
+All configured project URLs match the repository names. Earlier anonymous checks found `EcoRoute`, `AudienceIQ`, and `BlackBox---Ai`; the other 16 URLs returned 404. A 404 may mean the repository is private or unavailable. The project names and configured URLs remain in the profile; verify visibility and existence in GitHub if a link is inaccessible.
 
 ## Troubleshooting
 
-- **`PROFILE_READ_TOKEN` missing:** create the no-scope classic token, then use the hidden-prompt command above. The fetcher changes no data without it.
-- **401/403 or rate limit:** verify the token is valid and retry after rate limits reset. Do not paste the token into a log, issue, or chat.
-- **Unknown GraphQL user/calendar:** check that `github_username` and `contribution_graph.username` both identify `Anguharikarthick17`.
-- **Heatmap says data unavailable:** run the authenticated fetch successfully, then run `scripts/render_heatmap_svg.py`. Never substitute synthetic data as actual activity.
-- **Workflow cannot push:** enable Actions read/write workflow permissions and check branch protections; the workflow requires `contents: write`.
-- **Changed profile card is not reflected:** run `.venv/bin/python scripts/make_info_card.py`.
-- **Portrait placeholder:** provide your own local photo using the portrait command above; the original photo is not part of the repository.
+- **`PROFILE_READ_TOKEN` missing:** use the hidden-input command above locally, or add the Actions secret under repository settings.
+- **401/403 or rate limit:** check token validity and retry after rate limits reset. Do not paste the token into logs, issues, or chat.
+- **Unknown user/calendar:** confirm both configured usernames are `Anguharikarthick17`.
+- **Fetch failure:** the previous contribution JSON is preserved. Fix the API/authentication problem and rerun the fetch before rendering.
+- **Workflow cannot push:** enable Actions `GITHUB_TOKEN` read/write permissions and check branch protection; the workflow needs `contents: write`.
+- **Profile card is stale:** run `.venv/bin/python scripts/make_info_card.py`.
+- **Portrait is a placeholder:** provide a local photo with `--photo`; the source photo must remain under the ignored `photos/` folder and is never published by the generator.

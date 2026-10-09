@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -91,6 +92,11 @@ def fetch_calendar(username: str, token: str) -> dict:
         raise FetchError("GitHub returned a response with an unexpected JSON shape.")
     errors = payload.get("errors")
     if errors:
+        if not isinstance(errors, list) or not all(
+            isinstance(item, dict) and isinstance(item.get("message"), str)
+            for item in errors
+        ):
+            raise FetchError("GitHub returned malformed GraphQL errors.")
         messages = "; ".join(item.get("message", "Unknown GraphQL error") for item in errors)
         if any("rate limit" in message.lower() for message in messages.split("; ")):
             raise FetchError(f"GitHub API rate limit reached: {messages}. Retry after the limit resets.")
@@ -143,6 +149,12 @@ def fetch_calendar(username: str, token: str) -> dict:
                 }
             )
         weeks.append(week)
+    days = [day for week in weeks for day in week]
+    if sum(day["count"] for day in days) != total:
+        raise FetchError("GitHub contribution total does not match the daily contribution counts.")
+    dates = [date.fromisoformat(day["date"]) for day in days]
+    if any(current.toordinal() != previous.toordinal() + 1 for previous, current in zip(dates, dates[1:])):
+        raise FetchError("GitHub contribution dates are not consecutive and unique.")
     return {
         "available": True,
         "source": "GitHub GraphQL API",
@@ -218,7 +230,15 @@ def main() -> int:
         return 1
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=args.output.parent, delete=False
+    ) as output_file:
+        temporary_path = Path(output_file.name)
+        output_file.write(json.dumps(result, indent=2) + "\n")
+    try:
+        os.replace(temporary_path, args.output)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     print(f"Fetched {len(result['weeks'])} contribution weeks for {username} into {args.output}")
     return 0
 

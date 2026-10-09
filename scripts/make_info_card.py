@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 from xml.sax.saxutils import escape, quoteattr
@@ -13,7 +15,7 @@ from xml.sax.saxutils import escape, quoteattr
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / "data" / "profile.json"
 OUTPUT = ROOT / "assets" / "info-card.svg"
-LINE_LIMIT = 88
+LINE_LIMIT = 84
 COLOR_PATTERN = re.compile(r"#[0-9A-Fa-f]{6}\Z")
 
 
@@ -150,7 +152,8 @@ def card_lines(profile: dict) -> list[tuple[str, str, str | None]]:
         ("tools", "$ tools"),
     ):
         lines.append(("label", command, None))
-        lines.extend(("value", item, None) for item in profile[key])
+        if profile[key]:
+            lines.append(("value", " · ".join(profile[key]), None))
 
     lines.extend([("label", "$ location", None), ("value", profile["location"], None)])
     brand = profile["brand"]
@@ -159,12 +162,9 @@ def card_lines(profile: dict) -> list[tuple[str, str, str | None]]:
         ("value", brand["concept"], None),
         ("label", "$ brand-interests", None),
     ])
-    lines.extend(("value", item, None) for item in brand["interests"])
-
-    lines.append(("label", "$ projects", None))
-    for project in profile["projects"]:
-        lines.append(("link", project["name"], project["github_url"]))
-        lines.append(("value", project["description"], None))
+    if brand["interests"]:
+        lines.append(("value", " · ".join(brand["interests"]), None))
+    lines.append(("projects", "$ projects", None))
 
     github_url = f'https://github.com/{profile["github_username"]}'
     if "github" not in {label.casefold() for label in profile["social_links"]}:
@@ -187,40 +187,68 @@ def card_lines(profile: dict) -> list[tuple[str, str, str | None]]:
 
 
 def render(profile: dict) -> str:
-    expanded: list[tuple[str, str, str | None]] = []
-    for kind, text, href in card_lines(profile):
-        expanded.extend((kind, line, href) for line in wrap(text))
-    width = 900
-    row_height = 23
-    top = 78
-    height = max(240, top + len(expanded) * row_height + 28)
+    width = 920
+    row_height = 18
+    y = 76
     theme = profile.get("theme", {})
-    background = theme.get("background", "#07110d")
-    accent = theme.get("accent", "#63f59a")
-    text_color = theme.get("text", "#d8e7dd")
+    background = theme.get("background", "#0D1117")
+    accent = theme.get("accent", "#69F0A0")
+    text_color = theme.get("text", "#C9D1D9")
     svg_lines = []
-    for index, (kind, text, href) in enumerate(expanded):
-        y = top + index * row_height
-        safe = escape(text)
+    for kind, text, href in card_lines(profile):
         if kind == "label":
-            svg_lines.append(f'<text class="label" x="30" y="{y}">{safe}</text>')
+            svg_lines.append(f'<text class="label" x="30" y="{y}">{escape(text)}</text>')
+            y += row_height
+        elif kind == "projects":
+            svg_lines.append(f'<text class="label" x="30" y="{y}">{escape(text)}</text>')
+            y += row_height
+            project_rows = [
+                (
+                    project,
+                    wrap(project["description"], 55),
+                )
+                for project in profile["projects"]
+            ]
+            for index in range(0, len(project_rows), 2):
+                row_height_for_projects = 0
+                for column, (project, description_lines) in enumerate(project_rows[index:index + 2]):
+                    x = 30 + column * 432
+                    svg_lines.append(
+                        f'<a class="link" href={quoteattr(project["github_url"])}>'
+                        f'<text x="{x}" y="{y}">{escape(project["name"])}</text></a>'
+                    )
+                    for line_index, line in enumerate(description_lines, start=1):
+                        svg_lines.append(
+                            f'<text class="value" x="{x + 12}" y="{y + line_index * 16}">'
+                            f'{escape(line)}</text>'
+                        )
+                    row_height_for_projects = max(
+                        row_height_for_projects,
+                        (len(description_lines) + 1) * 16 + 3,
+                    )
+                y += row_height_for_projects
         elif kind == "link" and href:
-            svg_lines.append(
-                f'<a class="link" href={quoteattr(href)}>'
-                f'<text x="48" y="{y}">{safe}</text></a>'
-            )
+            for line in wrap(text):
+                svg_lines.append(
+                    f'<a class="link" href={quoteattr(href)}>'
+                    f'<text x="48" y="{y}">{escape(line)}</text></a>'
+                )
+                y += row_height
         else:
-            svg_lines.append(f'<text class="value" x="48" y="{y}">{safe}</text>')
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
+            for line in wrap(text):
+                svg_lines.append(f'<text class="value" x="48" y="{y}">{escape(line)}</text>')
+                y += row_height
+    height = max(240, y + 24)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">{escape(profile["display_name"])} | terminal profile</title>
   <desc id="desc">Terminal-style profile for {escape(profile["display_name"])} with configured focus areas, interests, languages, tools, projects, brand, and social links.</desc>
   <style>
     .bg {{ fill: {background}; }} .border {{ fill: none; stroke: #234634; }}
-    .bar {{ fill: #0d1c14; }} .dot-red {{ fill: #ff6b6b; }} .dot-yellow {{ fill: #ffd166; }}
+    .bar {{ fill: #151d25; }} .dot-red {{ fill: #ff6b6b; }} .dot-yellow {{ fill: #ffd166; }}
     .dot-green {{ fill: #4ade80; }} .muted {{ fill: #8ba596; font: 12px ui-monospace, Menlo, monospace; }}
-    text {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }}
+    text {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }}
     .label {{ fill: {accent}; }} .value {{ fill: {text_color}; }}
-    .link {{ fill: {accent}; font: 14px ui-monospace, Menlo, monospace; }}
+    .link {{ fill: {accent}; font: 12px ui-monospace, Menlo, monospace; }}
   </style>
   <rect class="bg" width="100%" height="100%" rx="12"/>
   <rect class="border" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="12"/>
@@ -243,7 +271,15 @@ def main() -> None:
     except (OSError, json.JSONDecodeError, ValueError) as error:
         parser.error(str(error))
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(svg, encoding="utf-8")
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=args.output.parent, delete=False
+    ) as output_file:
+        temporary_path = Path(output_file.name)
+        output_file.write(svg)
+    try:
+        os.replace(temporary_path, args.output)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     print(f"Wrote {args.output}")
 
 
