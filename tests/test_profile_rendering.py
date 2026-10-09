@@ -80,28 +80,38 @@ class ProfileRenderingTests(unittest.TestCase):
 
     def test_readme_content_and_project_links_match_configuration(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        project_section = readme.split("## 02 / PROJECT INDEX", 1)[1].split(
-            "## 03 / CONTRIBUTION SIGNAL", 1
+        self.assertTrue(readme.startswith("# AHK // ANGU HARI KARTHICK M"))
+        self.assertIn("SOFTWARE DEVELOPER · AI EXPLORER", readme)
+        self.assertIn("GENZLOG — THE DIGITAL LOG OF GEN Z", readme)
+
+        project_section = readme.split("<h3>PROJECT INDEX / 19 BUILDS</h3>", 1)[1].split(
+            "</table>", 1
         )[0]
-        markdown_projects = re.findall(
-            r"^\| \*\*\[([^\]]+)\]\((https://github\.com/[^)]+)\)\*\* — (.+) \|$",
+        html_projects = re.findall(
+            r'<td width="50%" valign="top"><a href="([^"]+)"><strong>([^<]+)</strong>'
+            r'</a><br><small>([^<]+)</small></td>',
             project_section,
-            flags=re.MULTILINE,
         )
         self.assertEqual(
-            markdown_projects,
+            html_projects,
             [
-                (project["name"], project["github_url"], project["description"])
+                (project["github_url"], project["name"], project["description"])
                 for project in self.profile["projects"]
             ],
         )
-        self.assertIn("All 19 configured projects are retained.", readme)
-        self.assertIn("access and visibility have not been independently verified", readme)
+        self.assertIn('<table width="100%">', readme)
+        self.assertIn('<td width="30%" valign="top">', readme)
+        self.assertIn('<td width="70%" valign="top">', readme)
+        self.assertIn("Project links are retained as configured", readme)
+        self.assertIn("## 01 / SYSTEM PROFILE", readme)
+        self.assertIn("## 02 / TOOLCHAIN", readme)
+        self.assertIn("## 03 / CONTRIBUTION SIGNAL", readme)
+        self.assertIn("## 04 / SIGNAL LINKS", readme)
+        self.assertIn("GENZLOG // END OF LOG — STAY CURIOUS. KEEP BUILDING.", readme)
 
-        for field in ("bio", "focus", "career_interests", "currently_building"):
-            for configured_value in (
-                [self.profile[field]] if isinstance(self.profile[field], str) else self.profile[field]
-            ):
+        self.assertIn(self.profile["bio"], readme)
+        for field in ("focus", "currently_building"):
+            for configured_value in self.profile[field]:
                 self.assertIn(configured_value, readme)
         for configured_value in self.profile["brand"]["interests"]:
             self.assertIn(configured_value, readme)
@@ -125,7 +135,15 @@ class ProfileRenderingTests(unittest.TestCase):
             html_images.append((alt.group(1), source.group(1)))
 
         images = [*markdown_images, *html_images]
-        self.assertEqual(len(images), 3)
+        self.assertEqual(len(images), 2)
+        self.assertEqual(
+            {relative_path for _, relative_path in images},
+            {"assets/ascii-portrait.svg", "assets/contrib-heatmap.svg"},
+        )
+        self.assertLess(
+            readme.index("assets/ascii-portrait.svg"),
+            readme.index("assets/contrib-heatmap.svg"),
+        )
         for alt_text, relative_path in images:
             self.assertTrue(alt_text.strip())
             self.assertFalse(relative_path.startswith(("http://", "https://", "/")))
