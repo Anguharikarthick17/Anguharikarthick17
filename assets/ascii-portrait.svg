@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 220" role="img" aria-labelledby="title desc">
+  <title id="title">AHK terminal portrait</title>
+  <desc id="desc">Portrait placeholder. Supply a local photo with scripts/make_ascii_svg.py --photo.</desc>
+  <style>
+    .background { fill: #07110d; }
+    .frame { fill: none; stroke: #234634; stroke-width: 1; }
+    .bar { fill: #0d1c14; }
+    .dot-red { fill: #ff6b6b; } .dot-yellow { fill: #ffd166; } .dot-green { fill: #4ade80; }
+    .brand { fill: #8ba596; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .ascii-row { fill: #63f59a; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre; opacity: 0; animation: reveal .32s ease-out forwards; }
+    .placeholder { fill: #63f59a; font: 600 16px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .hint { fill: #91a99a; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes reveal { to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .ascii-row { animation: none; opacity: 1; }
+    }
+  </style>
+  <rect class="background" width="100%" height="100%" rx="12"/>
+  <rect class="frame" x=".5" y=".5" width="559" height="219" rx="12"/>
+  <path class="bar" d="M12 1h536a11 11 0 0 1 11 11v31H1V12A11 11 0 0 1 12 1Z"/>
+  <circle class="dot-red" cx="21" cy="17" r="4"/><circle class="dot-yellow" cx="36" cy="17" r="4"/>
+  <circle class="dot-green" cx="51" cy="17" r="4"/>
+  <text class="brand" x="70" y="21">GENZLOG / portrait</text>
+  <text x="280" y="106" class="placeholder" text-anchor="middle">PORTRAIT NOT CONFIGURED</text><text x="280" y="132" class="hint" text-anchor="middle">Set --photo to a local image to generate your portrait.</text>
+</svg>

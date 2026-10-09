@@ -1,0 +1,169 @@
+{
+  "github_username": "Anguharikarthick17",
+  "display_name": "Angu Hari Karthick M",
+  "short_name": "AHK",
+  "role": "Software Developer | AI Explorer",
+  "bio": "Second-year undergraduate student passionate about software development, artificial intelligence, and building creative digital experiences.",
+  "focus": [
+    "Software Development",
+    "Artificial Intelligence",
+    "Web Development",
+    "Creative Technology",
+    "Gaming and Esports"
+  ],
+  "currently_building": [
+    "Personal software projects",
+    "GENZLOG - Creative Technology Brand"
+  ],
+  "career_interests": [
+    "Software Engineering",
+    "AI Engineering",
+    "AI-Assisted Development",
+    "Web Application Development"
+  ],
+  "languages": [
+    "Python",
+    "JavaScript",
+    "HTML",
+    "CSS",
+    "TypeScript"
+  ],
+  "tools": [
+    "Git",
+    "GitHub",
+    "GitHub Actions",
+    "Visual Studio Code"
+  ],
+  "location": "India",
+  "brand": {
+    "name": "GENZLOG",
+    "concept": "The Digital Log of Gen Z",
+    "interests": [
+      "Software",
+      "AI",
+      "Gaming and Esports",
+      "Creative Products"
+    ]
+  },
+  "projects": [
+    {
+      "name": "EcoRoute",
+      "description": "A software project focused on eco-friendly routing.",
+      "github_url": "https://github.com/Anguharikarthick17/EcoRoute"
+    },
+    {
+      "name": "AudienceIQ",
+      "description": "A project exploring audience intelligence.",
+      "github_url": "https://github.com/Anguharikarthick17/AudienceIQ"
+    },
+    {
+      "name": "BlackBox---Ai",
+      "description": "An AI-related software project.",
+      "github_url": "https://github.com/Anguharikarthick17/BlackBox---Ai"
+    },
+    {
+      "name": "CHESS-GAME",
+      "description": "A chess game project.",
+      "github_url": "https://github.com/Anguharikarthick17/CHESS-GAME"
+    },
+    {
+      "name": "AHK-MINI",
+      "description": "A personal software project.",
+      "github_url": "https://github.com/Anguharikarthick17/AHK-MINI"
+    },
+    {
+      "name": "AHK-DYNAMIC-ISLAND",
+      "description": "A personal interface project.",
+      "github_url": "https://github.com/Anguharikarthick17/AHK-DYNAMIC-ISLAND"
+    },
+    {
+      "name": "AHK-RESUME",
+      "description": "A resume-related project.",
+      "github_url": "https://github.com/Anguharikarthick17/AHK-RESUME"
+    },
+    {
+      "name": "MAIN-PORTFOLIO",
+      "description": "A portfolio project.",
+      "github_url": "https://github.com/Anguharikarthick17/MAIN-PORTFOLIO"
+    },
+    {
+      "name": "AHK-KEYCHAIN",
+      "description": "A keychain project.",
+      "github_url": "https://github.com/Anguharikarthick17/AHK-KEYCHAIN"
+    },
+    {
+      "name": "DATA-SENTINEL",
+      "description": "A data sentinel project.",
+      "github_url": "https://github.com/Anguharikarthick17/DATA-SENTINEL"
+    },
+    {
+      "name": "RESUMEFIT",
+      "description": "A resume-fit project.",
+      "github_url": "https://github.com/Anguharikarthick17/RESUMEFIT"
+    },
+    {
+      "name": "UNIGUARD-AI",
+      "description": "A UniGuard AI project.",
+      "github_url": "https://github.com/Anguharikarthick17/UNIGUARD-AI"
+    },
+    {
+      "name": "Word-Build",
+      "description": "A word-building project.",
+      "github_url": "https://github.com/Anguharikarthick17/Word-Build"
+    },
+    {
+      "name": "Portfolio-Sample",
+      "description": "A sample portfolio project.",
+      "github_url": "https://github.com/Anguharikarthick17/Portfolio-Sample"
+    },
+    {
+      "name": "Dodge-Game",
+      "description": "A dodge game project.",
+      "github_url": "https://github.com/Anguharikarthick17/Dodge-Game"
+    },
+    {
+      "name": "Road-Safety",
+      "description": "A road safety project.",
+      "github_url": "https://github.com/Anguharikarthick17/Road-Safety"
+    },
+    {
+      "name": "AI-AGRI-PROJECT",
+      "description": "An AI agriculture project.",
+      "github_url": "https://github.com/Anguharikarthick17/AI-AGRI-PROJECT"
+    },
+    {
+      "name": "FIXNOW-PORTEL---VIT",
+      "description": "A FixNow portal project.",
+      "github_url": "https://github.com/Anguharikarthick17/FIXNOW-PORTEL---VIT"
+    },
+    {
+      "name": "Love-Calculator",
+      "description": "A love calculator project.",
+      "github_url": "https://github.com/Anguharikarthick17/Love-Calculator"
+    }
+  ],
+  "social_links": {
+    "github": "https://github.com/Anguharikarthick17",
+    "linkedin": "https://www.linkedin.com/in/angu-hari-karthick-m-175753374",
+    "instagram": "https://www.instagram.com/angu.hk/"
+  },
+  "portfolio_url": "",
+  "email": "",
+  "leetcode_url": "",
+  "resume_url": "",
+  "contribution_graph": {
+    "enabled": true,
+    "data_source": "github",
+    "username": "Anguharikarthick17",
+    "display": "contribution-levels",
+    "auto_update": true
+  },
+  "theme": {
+    "style": "hacker-terminal",
+    "background": "#0D1117",
+    "accent": "#69F0A0",
+    "text": "#C9D1D9",
+    "font": "monospace",
+    "animations": true
+  }
+}
