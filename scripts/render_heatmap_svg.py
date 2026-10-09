@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render verified contribution-calendar JSON as an animated SVG heatmap."""
+"""Render verified contribution-calendar JSON as a static SVG heatmap."""
 
 from __future__ import annotations
 
@@ -15,11 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "contributions.json"
 OUTPUT = ROOT / "assets" / "contrib-heatmap.svg"
 COLORS = {
-    "NONE": "#161b22",
-    "FIRST_QUARTILE": "#0e4429",
-    "SECOND_QUARTILE": "#006d32",
-    "THIRD_QUARTILE": "#26a641",
-    "FOURTH_QUARTILE": "#39d353",
+    "NONE": "#111815",
+    "FIRST_QUARTILE": "#173A2B",
+    "SECOND_QUARTILE": "#1F6540",
+    "THIRD_QUARTILE": "#2B9A59",
+    "FOURTH_QUARTILE": "#67E6A4",
 }
 LEVEL_LABELS = ["Less", "More"]
 
@@ -57,9 +57,9 @@ def render_unavailable(message: str) -> str:
   <title id="title">Contribution heatmap not configured</title>
   <desc id="desc">{safe}</desc>
   <style>
-    .bg {{ fill: #0D1117; }} .border {{ fill: none; stroke: #234634; }}
-    .title {{ fill: #69F0A0; font: 600 16px ui-monospace, Menlo, monospace; }}
-    .message {{ fill: #C9D1D9; font: 13px ui-monospace, Menlo, monospace; }}
+    .bg {{ fill: #080B0A; }} .border {{ fill: none; stroke: #34433C; }}
+    .title {{ fill: #67E6A4; font: 600 14px ui-monospace, Menlo, monospace; }}
+    .message {{ fill: #A8B3AD; font: 12px ui-monospace, Menlo, monospace; }}
   </style>
   <rect class="bg" width="100%" height="100%" rx="12"/><rect class="border" x=".5" y=".5" width="859" height="149" rx="12"/>
   <text class="title" x="24" y="52">CONTRIBUTION DATA UNAVAILABLE</text>
@@ -105,7 +105,7 @@ def render(data: dict) -> str:
         title = f'{day_date.isoformat()}: {day["count"]} contributions (level {day["level"].lower()})'
         rects.append(
             f'<rect class="day" x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" '
-            f'fill="{COLORS[day["level"]]}" style="animation-delay:{len(rects) * 1.5:g}ms">'
+            f'fill="{COLORS[day["level"]]}">'
             f'<title>{escape(title)}</title></rect>'
         )
 
@@ -130,12 +130,10 @@ def render(data: dict) -> str:
   <title id="title">{username} GitHub contribution heatmap</title>
   <desc id="desc">Contribution intensity by day for {username}. Colors encode contribution levels; hover a square for the exact count and date. {escape(total_label)}.</desc>
   <style>
-    .bg {{ fill: #0D1117; }} .border {{ fill: none; stroke: #234634; }}
-    .heading {{ fill: #69F0A0; font: 600 14px ui-monospace, Menlo, monospace; }}
-    .muted {{ fill: #C9D1D9; font: 11px ui-monospace, Menlo, monospace; }}
-    .day {{ opacity: 0; animation: reveal .45s ease-out forwards; }}
-    @keyframes reveal {{ to {{ opacity: 1; }} }}
-    @media (prefers-reduced-motion: reduce) {{ .day {{ animation: none; opacity: 1; }} }}
+    .bg {{ fill: #080B0A; }} .border {{ fill: none; stroke: #34433C; }}
+    .heading {{ fill: #67E6A4; font: 600 13px ui-monospace, Menlo, monospace; letter-spacing: 1px; }}
+    .muted {{ fill: #A8B3AD; font: 10px ui-monospace, Menlo, monospace; }}
+    .day {{ stroke: #080B0A; stroke-width: .5; }}
   </style>
   <rect class="bg" width="100%" height="100%" rx="12"/><rect class="border" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="12"/>
   <text class="heading" x="24" y="27">{username} / CONTRIBUTIONS</text>

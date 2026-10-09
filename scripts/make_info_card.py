@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the profile's terminal information card from data/profile.json."""
+"""Build the AHK identity banner from data/profile.json."""
 
 from __future__ import annotations
 
@@ -10,35 +10,12 @@ import re
 import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
-from xml.sax.saxutils import escape, quoteattr
+from xml.sax.saxutils import escape
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = ROOT / "data" / "profile.json"
 OUTPUT = ROOT / "assets" / "info-card.svg"
-LINE_LIMIT = 84
 COLOR_PATTERN = re.compile(r"#[0-9A-Fa-f]{6}\Z")
-
-
-def wrap(text: str, limit: int = LINE_LIMIT) -> list[str]:
-    words = text.split()
-    lines: list[str] = []
-    current = ""
-    for word in words:
-        while len(word) > limit:
-            if current:
-                lines.append(current)
-                current = ""
-            lines.append(word[:limit])
-            word = word[limit:]
-        candidate = f"{current} {word}".strip()
-        if len(candidate) > limit:
-            lines.append(current)
-            current = word
-        else:
-            current = candidate
-    if current:
-        lines.append(current)
-    return lines or [""]
 
 
 def valid_link(value: str) -> bool:
@@ -135,128 +112,54 @@ def load_profile(path: Path) -> dict:
     return profile
 
 
-def card_lines(profile: dict) -> list[tuple[str, str, str | None]]:
-    lines: list[tuple[str, str, str | None]] = [
-        ("label", "$ whoami", None),
-        ("value", f'{profile["short_name"]} / {profile["display_name"]}', None),
-        ("label", "$ role", None),
-        ("value", profile["role"], None),
-        ("label", "$ bio", None),
-        ("value", profile["bio"], None),
-    ]
-    for key, command in (
-        ("focus", "$ focus"),
-        ("currently_building", "$ currently-building"),
-        ("career_interests", "$ career-interests"),
-        ("languages", "$ languages"),
-        ("tools", "$ tools"),
-    ):
-        lines.append(("label", command, None))
-        if profile[key]:
-            lines.append(("value", " · ".join(profile[key]), None))
-
-    lines.extend([("label", "$ location", None), ("value", profile["location"], None)])
-    brand = profile["brand"]
-    lines.extend([
-        ("label", f'$ brand / {brand["name"]}', None),
-        ("value", brand["concept"], None),
-        ("label", "$ brand-interests", None),
-    ])
-    if brand["interests"]:
-        lines.append(("value", " · ".join(brand["interests"]), None))
-    lines.append(("projects", "$ projects", None))
-
-    github_url = f'https://github.com/{profile["github_username"]}'
-    if "github" not in {label.casefold() for label in profile["social_links"]}:
-        lines.extend([("label", "$ github", None), ("link", github_url, github_url)])
-    for label, url in profile["social_links"].items():
-        if url:
-            lines.append(("link", label, url))
-    optional_links = (
-        ("portfolio", profile.get("portfolio_url", "")),
-        ("leetcode", profile.get("leetcode_url", "")),
-        ("resume", profile.get("resume_url", "")),
-    )
-    for label, url in optional_links:
-        if url:
-            lines.append(("link", label, url))
-    email = profile.get("email", "")
-    if email:
-        lines.append(("link", email, f"mailto:{email}"))
-    return lines
-
-
 def render(profile: dict) -> str:
-    width = 920
-    row_height = 18
-    y = 76
-    theme = profile.get("theme", {})
-    background = theme.get("background", "#0D1117")
-    accent = theme.get("accent", "#69F0A0")
-    text_color = theme.get("text", "#C9D1D9")
-    svg_lines = []
-    for kind, text, href in card_lines(profile):
-        if kind == "label":
-            svg_lines.append(f'<text class="label" x="30" y="{y}">{escape(text)}</text>')
-            y += row_height
-        elif kind == "projects":
-            svg_lines.append(f'<text class="label" x="30" y="{y}">{escape(text)}</text>')
-            y += row_height
-            project_rows = [
-                (
-                    project,
-                    wrap(project["description"], 55),
-                )
-                for project in profile["projects"]
-            ]
-            for index in range(0, len(project_rows), 2):
-                row_height_for_projects = 0
-                for column, (project, description_lines) in enumerate(project_rows[index:index + 2]):
-                    x = 30 + column * 432
-                    svg_lines.append(
-                        f'<a class="link" href={quoteattr(project["github_url"])}>'
-                        f'<text x="{x}" y="{y}">{escape(project["name"])}</text></a>'
-                    )
-                    for line_index, line in enumerate(description_lines, start=1):
-                        svg_lines.append(
-                            f'<text class="value" x="{x + 12}" y="{y + line_index * 16}">'
-                            f'{escape(line)}</text>'
-                        )
-                    row_height_for_projects = max(
-                        row_height_for_projects,
-                        (len(description_lines) + 1) * 16 + 3,
-                    )
-                y += row_height_for_projects
-        elif kind == "link" and href:
-            for line in wrap(text):
-                svg_lines.append(
-                    f'<a class="link" href={quoteattr(href)}>'
-                    f'<text x="48" y="{y}">{escape(line)}</text></a>'
-                )
-                y += row_height
-        else:
-            for line in wrap(text):
-                svg_lines.append(f'<text class="value" x="48" y="{y}">{escape(line)}</text>')
-                y += row_height
-    height = max(240, y + 24)
+    width, height = 1000, 440
+    name = escape(profile["display_name"])
+    short_name = escape(profile["short_name"])
+    role = escape(profile["role"])
+    brand_name = escape(profile["brand"]["name"])
+    brand_concept = escape(profile["brand"]["concept"].upper())
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
-  <title id="title">{escape(profile["display_name"])} | terminal profile</title>
-  <desc id="desc">Terminal-style profile for {escape(profile["display_name"])} with configured focus areas, interests, languages, tools, projects, brand, and social links.</desc>
+  <title id="title">{short_name} // DIGITAL OPERATING SYSTEM</title>
+  <desc id="desc">{name}, {role}. {brand_name} — {brand_concept}.</desc>
   <style>
-    .bg {{ fill: {background}; }} .border {{ fill: none; stroke: #234634; }}
-    .bar {{ fill: #151d25; }} .dot-red {{ fill: #ff6b6b; }} .dot-yellow {{ fill: #ffd166; }}
-    .dot-green {{ fill: #4ade80; }} .muted {{ fill: #8ba596; font: 12px ui-monospace, Menlo, monospace; }}
-    text {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }}
-    .label {{ fill: {accent}; }} .value {{ fill: {text_color}; }}
-    .link {{ fill: {accent}; font: 12px ui-monospace, Menlo, monospace; }}
+    .bg {{ fill: #080B0A; }}
+    .grid {{ stroke: #18211D; stroke-width: 1; }}
+    .frame {{ fill: none; stroke: #34433C; stroke-width: 1; }}
+    .accent {{ fill: #67E6A4; }}
+    .muted {{ fill: #84918A; }}
+    .primary {{ fill: #E5EBE7; }}
+    .eyebrow {{ font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 2px; }}
+    .hero {{ font: 700 144px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -10px; }}
+    .name {{ font: 500 30px ui-sans-serif, system-ui, sans-serif; letter-spacing: .3px; }}
+    .role {{ font: 15px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .5px; }}
+    .micro {{ font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; }}
+    .rule {{ stroke: #34433C; stroke-width: 1; }}
+    .ring {{ fill: none; stroke: #26372F; stroke-width: 1; }}
   </style>
-  <rect class="bg" width="100%" height="100%" rx="12"/>
-  <rect class="border" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="12"/>
-  <path class="bar" d="M12 1h{width - 24}a11 11 0 0 1 11 11v32H1V12A11 11 0 0 1 12 1Z"/>
-  <circle class="dot-red" cx="21" cy="17" r="4"/><circle class="dot-yellow" cx="36" cy="17" r="4"/>
-  <circle class="dot-green" cx="51" cy="17" r="4"/>
-  <text class="muted" x="70" y="21">{escape(profile["brand"]["name"])} / profile.json</text>
-  {''.join(svg_lines)}
+  <rect class="bg" width="{width}" height="{height}"/>
+  <path class="grid" d="M0 110H1000M0 330H1000M520 0V440M940 0V440" opacity=".55"/>
+  <path class="frame" d="M18 1H982a17 17 0 0 1 17 17V422a17 17 0 0 1-17 17H18A17 17 0 0 1 1 422V18A17 17 0 0 1 18 1Z"/>
+  <path class="accent" d="M40 48h34v2H40zM40 48v34h2V48z"/>
+  <text class="eyebrow accent" x="56" y="70">{brand_name} <tspan class="muted">/</tspan> {brand_concept}</text>
+  <text class="micro muted" x="944" y="70" text-anchor="end">AHK <tspan class="accent">//</tspan> DIGITAL OPERATING SYSTEM</text>
+  <text class="hero accent" x="56" y="232">{short_name}</text>
+  <path class="rule" d="M60 258H535"/>
+  <text class="name primary" x="61" y="304">{name}</text>
+  <text class="role muted" x="62" y="338">{role}</text>
+  <text class="micro muted" x="62" y="395">IDENTITY <tspan class="accent">/</tspan> 001</text>
+  <text class="micro muted" x="490" y="395" text-anchor="end">GENZLOG <tspan class="accent">//</tspan> PERSONAL SYSTEMS</text>
+  <g transform="translate(733 218)">
+    <circle class="ring" r="142"/><circle class="ring" r="116"/><circle class="ring" r="72"/>
+    <path class="rule" d="M-170 0H170M0-170V170M-120-120L120 120M120-120L-120 120" opacity=".58"/>
+    <path class="accent" d="M0-151v22M0 129v22M-151 0h22M129 0h22" stroke="#67E6A4" stroke-width="2"/>
+    <circle class="accent" r="4"/><circle class="ring" r="16"/>
+    <text class="micro muted" x="0" y="-184" text-anchor="middle">AHK / CORE ID</text>
+    <text class="micro muted" x="0" y="195" text-anchor="middle">GENZLOG · EST. BY CURIOSITY</text>
+    <text class="micro accent" x="147" y="-118">01</text>
+    <text class="micro accent" x="-168" y="135">SYS</text>
+  </g>
+  <path class="accent" d="M958 359h18v2h-18zM974 343h2v18h-2z"/>
 </svg>
 '''
 

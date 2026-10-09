@@ -83,17 +83,22 @@ class PortraitGenerationTests(unittest.TestCase):
         self.assertIn("PORTRAIT NOT CONFIGURED", "".join(root.itertext()))
         self.assertNotIn("<image", svg)
 
-    def test_svg_escapes_text_and_keeps_terminal_portrait_design(self):
+    def test_svg_escapes_text_and_uses_static_custom_portrait_frame(self):
         svg = portrait.render_svg(["<&\"@"], columns=4, label="")
         root = ElementTree.fromstring(svg)
         namespace = {"svg": "http://www.w3.org/2000/svg"}
 
-        self.assertEqual(root.findtext("svg:title", namespaces=namespace), "AHK terminal portrait")
+        self.assertEqual(root.findtext("svg:title", namespaces=namespace), "AHK portrait study")
         self.assertIn("&lt;&amp;\"@", svg)
-        self.assertIn('<desc id="desc">A monochrome ASCII rendering of a user-provided portrait, revealed line by line.</desc>', svg)
-        self.assertIn('fill: #69F0A0', svg)
-        self.assertIn("GENZLOG / portrait", svg)
-        self.assertIn("prefers-reduced-motion: reduce", svg)
+        self.assertIn(
+            "<desc id=\"desc\">A compact monochrome ASCII rendering of a locally supplied portrait.</desc>",
+            svg,
+        )
+        self.assertIn("fill: #67E6A4", svg)
+        self.assertIn("AHK", svg)
+        self.assertIn("GENZLOG / LOCAL", svg)
+        self.assertNotIn("animation", svg)
+        self.assertLessEqual(int(root.attrib["width"]), 400)
 
 
 if __name__ == "__main__":

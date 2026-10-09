@@ -1,19 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="920" height="972" viewBox="0 0 920 972" role="img" aria-labelledby="title desc">
-  <title id="title">Angu Hari Karthick M | terminal profile</title>
-  <desc id="desc">Terminal-style profile for Angu Hari Karthick M with configured focus areas, interests, languages, tools, projects, brand, and social links.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="440" viewBox="0 0 1000 440" role="img" aria-labelledby="title desc">
+  <title id="title">AHK // DIGITAL OPERATING SYSTEM</title>
+  <desc id="desc">Angu Hari Karthick M, Software Developer | AI Explorer. GENZLOG — THE DIGITAL LOG OF GEN Z.</desc>
   <style>
-    .bg { fill: #0D1117; } .border { fill: none; stroke: #234634; }
-    .bar { fill: #151d25; } .dot-red { fill: #ff6b6b; } .dot-yellow { fill: #ffd166; }
-    .dot-green { fill: #4ade80; } .muted { fill: #8ba596; font: 12px ui-monospace, Menlo, monospace; }
-    text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
-    .label { fill: #69F0A0; } .value { fill: #C9D1D9; }
-    .link { fill: #69F0A0; font: 12px ui-monospace, Menlo, monospace; }
+    .bg { fill: #080B0A; }
+    .grid { stroke: #18211D; stroke-width: 1; }
+    .frame { fill: none; stroke: #34433C; stroke-width: 1; }
+    .accent { fill: #67E6A4; }
+    .muted { fill: #84918A; }
+    .primary { fill: #E5EBE7; }
+    .eyebrow { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 2px; }
+    .hero { font: 700 144px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -10px; }
+    .name { font: 500 30px ui-sans-serif, system-ui, sans-serif; letter-spacing: .3px; }
+    .role { font: 15px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .5px; }
+    .micro { font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; }
+    .rule { stroke: #34433C; stroke-width: 1; }
+    .ring { fill: none; stroke: #26372F; stroke-width: 1; }
   </style>
-  <rect class="bg" width="100%" height="100%" rx="12"/>
-  <rect class="border" x=".5" y=".5" width="919" height="971" rx="12"/>
-  <path class="bar" d="M12 1h896a11 11 0 0 1 11 11v32H1V12A11 11 0 0 1 12 1Z"/>
-  <circle class="dot-red" cx="21" cy="17" r="4"/><circle class="dot-yellow" cx="36" cy="17" r="4"/>
-  <circle class="dot-green" cx="51" cy="17" r="4"/>
-  <text class="muted" x="70" y="21">GENZLOG / profile.json</text>
-  <text class="label" x="30" y="76">$ whoami</text><text class="value" x="48" y="94">AHK / Angu Hari Karthick M</text><text class="label" x="30" y="112">$ role</text><text class="value" x="48" y="130">Software Developer | AI Explorer</text><text class="label" x="30" y="148">$ bio</text><text class="value" x="48" y="166">Second-year undergraduate student passionate about software development, artificial</text><text class="value" x="48" y="184">intelligence, and building creative digital experiences.</text><text class="label" x="30" y="202">$ focus</text><text class="value" x="48" y="220">Software Development · Artificial Intelligence · Web Development · Creative</text><text class="value" x="48" y="238">Technology · Gaming and Esports</text><text class="label" x="30" y="256">$ currently-building</text><text class="value" x="48" y="274">Personal software projects · GENZLOG - Creative Technology Brand</text><text class="label" x="30" y="292">$ career-interests</text><text class="value" x="48" y="310">Software Engineering · AI Engineering · AI-Assisted Development · Web Application</text><text class="value" x="48" y="328">Development</text><text class="label" x="30" y="346">$ languages</text><text class="value" x="48" y="364">Python · JavaScript · HTML · CSS · TypeScript</text><text class="label" x="30" y="382">$ tools</text><text class="value" x="48" y="400">Git · GitHub · GitHub Actions · Visual Studio Code</text><text class="label" x="30" y="418">$ location</text><text class="value" x="48" y="436">India</text><text class="label" x="30" y="454">$ brand / GENZLOG</text><text class="value" x="48" y="472">The Digital Log of Gen Z</text><text class="label" x="30" y="490">$ brand-interests</text><text class="value" x="48" y="508">Software · AI · Gaming and Esports · Creative Products</text><text class="label" x="30" y="526">$ projects</text><a class="link" href="https://github.com/Anguharikarthick17/EcoRoute"><text x="30" y="544">EcoRoute</text></a><text class="value" x="42" y="560">A software project focused on eco-friendly routing.</text><a class="link" href="https://github.com/Anguharikarthick17/AudienceIQ"><text x="462" y="544">AudienceIQ</text></a><text class="value" x="474" y="560">A project exploring audience intelligence.</text><a class="link" href="https://github.com/Anguharikarthick17/BlackBox---Ai"><text x="30" y="579">BlackBox---Ai</text></a><text class="value" x="42" y="595">An AI-related software project.</text><a class="link" href="https://github.com/Anguharikarthick17/CHESS-GAME"><text x="462" y="579">CHESS-GAME</text></a><text class="value" x="474" y="595">A chess game project.</text><a class="link" href="https://github.com/Anguharikarthick17/AHK-MINI"><text x="30" y="614">AHK-MINI</text></a><text class="value" x="42" y="630">A personal software project.</text><a class="link" href="https://github.com/Anguharikarthick17/AHK-DYNAMIC-ISLAND"><text x="462" y="614">AHK-DYNAMIC-ISLAND</text></a><text class="value" x="474" y="630">A personal interface project.</text><a class="link" href="https://github.com/Anguharikarthick17/AHK-RESUME"><text x="30" y="649">AHK-RESUME</text></a><text class="value" x="42" y="665">A resume-related project.</text><a class="link" href="https://github.com/Anguharikarthick17/MAIN-PORTFOLIO"><text x="462" y="649">MAIN-PORTFOLIO</text></a><text class="value" x="474" y="665">A portfolio project.</text><a class="link" href="https://github.com/Anguharikarthick17/AHK-KEYCHAIN"><text x="30" y="684">AHK-KEYCHAIN</text></a><text class="value" x="42" y="700">A keychain project.</text><a class="link" href="https://github.com/Anguharikarthick17/DATA-SENTINEL"><text x="462" y="684">DATA-SENTINEL</text></a><text class="value" x="474" y="700">A data sentinel project.</text><a class="link" href="https://github.com/Anguharikarthick17/RESUMEFIT"><text x="30" y="719">RESUMEFIT</text></a><text class="value" x="42" y="735">A resume-fit project.</text><a class="link" href="https://github.com/Anguharikarthick17/UNIGUARD-AI"><text x="462" y="719">UNIGUARD-AI</text></a><text class="value" x="474" y="735">A UniGuard AI project.</text><a class="link" href="https://github.com/Anguharikarthick17/Word-Build"><text x="30" y="754">Word-Build</text></a><text class="value" x="42" y="770">A word-building project.</text><a class="link" href="https://github.com/Anguharikarthick17/Portfolio-Sample"><text x="462" y="754">Portfolio-Sample</text></a><text class="value" x="474" y="770">A sample portfolio project.</text><a class="link" href="https://github.com/Anguharikarthick17/Dodge-Game"><text x="30" y="789">Dodge-Game</text></a><text class="value" x="42" y="805">A dodge game project.</text><a class="link" href="https://github.com/Anguharikarthick17/Road-Safety"><text x="462" y="789">Road-Safety</text></a><text class="value" x="474" y="805">A road safety project.</text><a class="link" href="https://github.com/Anguharikarthick17/AI-AGRI-PROJECT"><text x="30" y="824">AI-AGRI-PROJECT</text></a><text class="value" x="42" y="840">An AI agriculture project.</text><a class="link" href="https://github.com/Anguharikarthick17/FIXNOW-PORTEL---VIT"><text x="462" y="824">FIXNOW-PORTEL---VIT</text></a><text class="value" x="474" y="840">A FixNow portal project.</text><a class="link" href="https://github.com/Anguharikarthick17/Love-Calculator"><text x="30" y="859">Love-Calculator</text></a><text class="value" x="42" y="875">A love calculator project.</text><a class="link" href="https://github.com/Anguharikarthick17"><text x="48" y="894">github</text></a><a class="link" href="https://www.linkedin.com/in/angu-hari-karthick-m-175753374"><text x="48" y="912">linkedin</text></a><a class="link" href="https://www.instagram.com/angu.hk/"><text x="48" y="930">instagram</text></a>
+  <rect class="bg" width="1000" height="440"/>
+  <path class="grid" d="M0 110H1000M0 330H1000M520 0V440M940 0V440" opacity=".55"/>
+  <path class="frame" d="M18 1H982a17 17 0 0 1 17 17V422a17 17 0 0 1-17 17H18A17 17 0 0 1 1 422V18A17 17 0 0 1 18 1Z"/>
+  <path class="accent" d="M40 48h34v2H40zM40 48v34h2V48z"/>
+  <text class="eyebrow accent" x="56" y="70">GENZLOG <tspan class="muted">/</tspan> THE DIGITAL LOG OF GEN Z</text>
+  <text class="micro muted" x="944" y="70" text-anchor="end">AHK <tspan class="accent">//</tspan> DIGITAL OPERATING SYSTEM</text>
+  <text class="hero accent" x="56" y="232">AHK</text>
+  <path class="rule" d="M60 258H535"/>
+  <text class="name primary" x="61" y="304">Angu Hari Karthick M</text>
+  <text class="role muted" x="62" y="338">Software Developer | AI Explorer</text>
+  <text class="micro muted" x="62" y="395">IDENTITY <tspan class="accent">/</tspan> 001</text>
+  <text class="micro muted" x="490" y="395" text-anchor="end">GENZLOG <tspan class="accent">//</tspan> PERSONAL SYSTEMS</text>
+  <g transform="translate(733 218)">
+    <circle class="ring" r="142"/><circle class="ring" r="116"/><circle class="ring" r="72"/>
+    <path class="rule" d="M-170 0H170M0-170V170M-120-120L120 120M120-120L-120 120" opacity=".58"/>
+    <path class="accent" d="M0-151v22M0 129v22M-151 0h22M129 0h22" stroke="#67E6A4" stroke-width="2"/>
+    <circle class="accent" r="4"/><circle class="ring" r="16"/>
+    <text class="micro muted" x="0" y="-184" text-anchor="middle">AHK / CORE ID</text>
+    <text class="micro muted" x="0" y="195" text-anchor="middle">GENZLOG · EST. BY CURIOSITY</text>
+    <text class="micro accent" x="147" y="-118">01</text>
+    <text class="micro accent" x="-168" y="135">SYS</text>
+  </g>
+  <path class="accent" d="M958 359h18v2h-18zM974 343h2v18h-2z"/>
 </svg>

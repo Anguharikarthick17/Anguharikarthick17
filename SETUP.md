@@ -21,7 +21,7 @@ The original photo is `photos/portrait.jpg`, which is excluded from Git. The gen
 ```bash
 .venv/bin/python scripts/make_ascii_svg.py \
   --photo photos/portrait.jpg \
-  --columns 160 \
+  --columns 42 \
   --brightness 1.0 \
   --contrast 1.15 \
   --crop subject
@@ -29,7 +29,7 @@ The original photo is `photos/portrait.jpg`, which is excluded from Git. The gen
 .venv/bin/python scripts/render_heatmap_svg.py
 ```
 
-The portrait generator crops around darker foreground pixels with a default grayscale threshold of `232`. Use `--crop full` or adjust `--background-threshold` for a photo with a different background. Running the portrait generator without `--photo` deliberately writes a labeled placeholder, so do not omit the photo argument when keeping the current portrait.
+The portrait generator crops around darker foreground pixels with a default grayscale threshold of `232` and renders a compact, static panel. Use `--crop full` or adjust `--background-threshold` for a photo with a different background. Running the portrait generator without `--photo` deliberately writes a labeled placeholder, so do not omit the photo argument when keeping the current portrait.
 
 ## Fetch real GitHub contributions locally
 
@@ -70,7 +70,7 @@ Configure the profile repository:
 2. Under **Settings → Actions → General → Workflow permissions**, allow read and write permissions for `GITHUB_TOKEN`. The workflow requests only `contents: write`. Branch protection can still prevent its commit.
 3. Ensure Actions are enabled. Open **Actions → Update profile contribution art → Run workflow** to run it manually.
 
-If the secret is missing, the fetcher fails clearly without replacing the last valid contribution data or exposing credentials. The workflow does not change the local portrait or the information card.
+If the secret is missing, the fetcher fails clearly without replacing the last valid contribution data or exposing credentials. The workflow does not change the local portrait or the identity banner.
 
 ## Preview and publish
 
@@ -78,7 +78,7 @@ Use VS Code's Markdown preview for `README.md`. The local artwork paths are `ass
 
 The profile repository must be named exactly `Anguharikarthick17`. This setup does not configure remotes or publish anything. Review changes locally; commit or push only when you choose to do so.
 
-All configured project URLs match the repository names. Earlier anonymous checks found `EcoRoute`, `AudienceIQ`, and `BlackBox---Ai`; the other 16 URLs returned 404. A 404 may mean the repository is private or unavailable. The project names and configured URLs remain in the profile; verify visibility and existence in GitHub if a link is inaccessible.
+All configured project URLs match the repository names in `data/profile.json`. Their current existence and visibility have not been independently verified; private or unavailable repositories may return 404. The project names and URLs remain in the profile, and are shown as configured in the README.
 
 ## Troubleshooting
 
@@ -87,5 +87,5 @@ All configured project URLs match the repository names. Earlier anonymous checks
 - **Unknown user/calendar:** confirm both configured usernames are `Anguharikarthick17`.
 - **Fetch failure:** the previous contribution JSON is preserved. Fix the API/authentication problem and rerun the fetch before rendering.
 - **Workflow cannot push:** enable Actions `GITHUB_TOKEN` read/write permissions and check branch protection; the workflow needs `contents: write`.
-- **Profile card is stale:** run `.venv/bin/python scripts/make_info_card.py`.
+- **Identity banner is stale:** run `.venv/bin/python scripts/make_info_card.py`.
 - **Portrait is a placeholder:** provide a local photo with `--photo`; the source photo must remain under the ignored `photos/` folder and is never published by the generator.

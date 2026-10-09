@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a local portrait as an animated, monochrome ASCII SVG."""
+"""Render a local portrait as a compact, static monochrome ASCII SVG."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ OUTPUT = ROOT / "assets" / "ascii-portrait.svg"
 RAMP = "@%#*+=-:. "
 CHAR_ASPECT_RATIO = 0.5
 CELL_WIDTH = 5
-CELL_HEIGHT = 9
+CELL_HEIGHT = 8
 
 
 def grayscale_to_ascii(value: int) -> str:
@@ -78,11 +78,11 @@ def image_to_ascii(
 
 
 def render_svg(rows: list[str] | None, columns: int, label: str) -> str:
-    text_x, text_y = 28, 72
+    text_x, text_y = 28, 76
     if rows is None:
-        rows = ["", "", "", "", "", ""]
-    width = max(520, columns * CELL_WIDTH + 56)
-    height = max(210, len(rows) * CELL_HEIGHT + 112)
+        rows = []
+    width = max(310, columns * CELL_WIDTH + 56)
+    height = max(220, len(rows) * CELL_HEIGHT + 102)
     content = []
 
     if label:
@@ -98,39 +98,35 @@ def render_svg(rows: list[str] | None, columns: int, label: str) -> str:
         for index, row in enumerate(rows):
             content.append(
                 f'<text x="{text_x}" y="{text_y + index * CELL_HEIGHT}" '
-                f'class="ascii-row" style="animation-delay:{index * 38}ms">{escape(row)}</text>'
+                f'class="ascii-row">{escape(row)}</text>'
             )
 
-    title = "AHK terminal portrait"
+    title = "AHK portrait study"
     description = (
         "Portrait placeholder. Supply a local photo with scripts/make_ascii_svg.py --photo."
         if label
-        else "A monochrome ASCII rendering of a user-provided portrait, revealed line by line."
+        else "A compact monochrome ASCII rendering of a locally supplied portrait."
     )
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">{title}</title>
   <desc id="desc">{description}</desc>
   <style>
-    .background {{ fill: #0D1117; }}
-    .frame {{ fill: none; stroke: #234634; stroke-width: 1; }}
-    .bar {{ fill: #151d25; }}
-    .dot-red {{ fill: #ff6b6b; }} .dot-yellow {{ fill: #ffd166; }} .dot-green {{ fill: #4ade80; }}
-    .brand {{ fill: #8ba596; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}
-    .ascii-row {{ fill: #69F0A0; font: 8px ui-monospace, SFMono-Regular, Menlo, monospace;
-      white-space: pre; opacity: 0; animation: reveal .32s ease-out forwards; }}
-    .placeholder {{ fill: #69F0A0; font: 600 16px ui-monospace, SFMono-Regular, Menlo, monospace; }}
-    .hint {{ fill: #91a99a; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }}
-    @keyframes reveal {{ to {{ opacity: 1; }} }}
-    @media (prefers-reduced-motion: reduce) {{
-      .ascii-row {{ animation: none; opacity: 1; }}
-    }}
+    .background {{ fill: #080B0A; }}
+    .frame {{ fill: none; stroke: #34433C; stroke-width: 1; }}
+    .rule {{ stroke: #26372F; stroke-width: 1; }}
+    .brand {{ fill: #67E6A4; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; }}
+    .meta {{ fill: #84918A; font: 9px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .5px; }}
+    .ascii-row {{ fill: #67E6A4; font: 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre; }}
+    .placeholder {{ fill: #67E6A4; font: 600 14px ui-monospace, SFMono-Regular, Menlo, monospace; }}
+    .hint {{ fill: #84918A; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }}
   </style>
-  <rect class="background" width="100%" height="100%" rx="12"/>
-  <rect class="frame" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="12"/>
-  <path class="bar" d="M12 1h{width - 24}a11 11 0 0 1 11 11v31H1V12A11 11 0 0 1 12 1Z"/>
-  <circle class="dot-red" cx="21" cy="17" r="4"/><circle class="dot-yellow" cx="36" cy="17" r="4"/>
-  <circle class="dot-green" cx="51" cy="17" r="4"/>
-  <text class="brand" x="70" y="21">GENZLOG / portrait</text>
+  <rect class="background" width="{width}" height="{height}" rx="10"/>
+  <rect class="frame" x=".5" y=".5" width="{width - 1}" height="{height - 1}" rx="10"/>
+  <path class="rule" d="M16 48H{width - 16}"/>
+  <text class="brand" x="22" y="31">AHK <tspan class="meta">//</tspan> PORTRAIT</text>
+  <text class="meta" x="{width - 22}" y="31" text-anchor="end">GENZLOG / LOCAL</text>
+  <path class="brand" d="M16 15h14v1H16zM16 15v14h1V15zM{width - 30} {height - 16}h14v1h-14zM{width - 17} {height - 29}h1v14h-1z"/>
   {''.join(content)}
 </svg>
 '''
